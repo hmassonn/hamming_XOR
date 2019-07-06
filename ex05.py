@@ -6,7 +6,7 @@ import binascii
 KEYSIZE_MIN = 2
 KEYSIZE_MAX = 40
 KEYSIZE = 2
-PROBA_LETTER = 70
+PROBA_LETTER = 80
 
 def encode_hex(s):
 	return codecs.encode(s, "hex_codec")
@@ -16,7 +16,6 @@ def decoderin(s):
 letters = list(range(97, 122)) + [32]
 
 def single_xoring(s1, c):
-	print(s1)
 	s2 = c * len(s1)
 	return bytes([ a ^ b for (a, b) in zip(s1, s2)])
 
@@ -102,48 +101,39 @@ def evaluate(strin):
 	maxtot = 0
 	for c in strin:
 		maxtot += 1
+		# print(c)
 		for x in letters:
 			if c == x:
 				total += 1
 	return (total / maxtot) * 100
- 
-
-
-# gros probleme sur le brute/eval le xor n'as pas l'air de se faire 
-
 
 # get bests results for analyse of bruteforced single XOR
 def brute_forced(cipher_string):
-	list_of_possible_breaking_cipher = []
+	breaking_cipher_list = []
 	for i in range(0, 255):
 		i_b = i.to_bytes(1, byteorder='big')
 		result = single_xoring(decoderin(cipher_string), i_b)
-	if evaluate(result) > PROBA_LETTER:
-		list_of_possible_breaking_cipher.insert(result)
-	return list_of_possible_breaking_cipher
+		# print(evaluate(result), PROBA_LETTER, evaluate(result) > PROBA_LETTER)
+		if evaluate(result) > PROBA_LETTER:
+			# breaking_cipher_list.insert(len(breaking_cipher_list), result)
+			breaking_cipher_list.insert(len(breaking_cipher_list), i_b)
+	return breaking_cipher_list
 
 # loop on all chain
 def brutalize_all_lists(list_block):
+	# print(list_block)
 	for one_str in list_block:
 		str_encode = binascii.hexlify(codecs.encode(one_str)).decode('ascii')
+		# print(one_str)
 		# print(codecs.encode(str_encode))
 		# print(str_encode)
 		print(brute_forced(str_encode))
-		return
-
-
-# a checker dans ce bout de code
-
 
 # print(hamming('this is a test', 'wokka wokka!!!'))
 # print(str(get_file(), 'utf-8'))
 
-# s = 'Hello world'
-# l = list(s)
-# l[6] = 'W'
-# s = "".join(l) # s = 'Hello World'
-
 cipher_text = get_file()
+# print(cipher_text)
 list_size_key = battery_hamming(cipher_text)
 list_of_ranked_size = sorted(list_size_key.items(), key = lambda kv:(kv[1], kv[0]))
 # print(list_of_ranked_size)
