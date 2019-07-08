@@ -3,9 +3,9 @@ import base64
 import codecs
 import binascii
 
-KEYSIZE_MIN = 2
-KEYSIZE_MAX = 40
-KEYSIZE = 2
+KEYSIZE_MIN = 1
+KEYSIZE_MAX = 50
+# KEYSIZE = 2
 PROBA_LETTER = 70
 
 def encode_hex(s):
@@ -42,6 +42,8 @@ def convert(text, key):
 	size_key = 0
 	long_key = ''
 	for each in text:
+		# print(long_key)
+		# print(key)
 		long_key += key[size_key]
 		size_key += 1
 		if size_key == len(key):
@@ -101,7 +103,6 @@ def evaluate(strin):
 	maxtot = 0
 	for c in strin:
 		maxtot += 1
-		# print(c)
 		for x in letters:
 			if c == x:
 				total += 1
@@ -121,28 +122,106 @@ def brute_forced(cipher_string):
 
 # loop on all chain
 def brutalize_all_lists(list_block):
-	# print(list_block)
 	for one_str in list_block:
 		str_encode = binascii.hexlify(codecs.encode(one_str)).decode('ascii')
-		# print(one_str)
 		# print(codecs.encode(str_encode))
-		# print(str_encode)
 		print(brute_forced(str_encode))
 
-# print(hamming('this is a test', 'wokka wokka!!!'))
-# print(str(get_file(), 'utf-8'))
+def better_ranking_letter(cipher_string, key=''):
+	breaking_cipher_list = [None, '']
+	# for i in range(0, 255):
+	for i in letters:
+		# print(key + chr(i))
+		# print(breaking_cipher_list[1])
+		result = convert(cipher_string, key + chr(i))
+		if breaking_cipher_list[0] == None:
+			breaking_cipher_list[0] = result
+			breaking_cipher_list[1] = i
+		elif evaluate(result) > evaluate(breaking_cipher_list[0]):
+			breaking_cipher_list[0] = result
+			breaking_cipher_list[1] = i
+		print(evaluate(result), chr(i))
+	return breaking_cipher_list[1]
+
+def one_by_one(hexipher_text):
+	key = ''
+	for each in range(0, 47):
+		key += chr(better_ranking_letter(hexipher_text, key))
+		last_key = key[len(key)-1]
+		hexipher_text = binascii.hexlify(convert(hexipher_text, last_key)).decode('utf-8')
+		print("key:", key)
+		# print("text : ", hexipher_text)
+
 
 # cipher_text = get_file()
 cipher_text = 'NwMXGRwQB0wcB1MHBw0PHFMVGhkLUxAAAUwcCxYXFgUaFlNEVSkXBRwcEBZZBRwRBwlZMCVFBhkLUx0KAR4cUxIBBwkKABZFGA0QH1MBEEEaGxIXDA4dFl4AG0EKEAoJGQ05EAoHEB4OEgcGHUIfAV9FFA8aHB4VFAsXsNpFERlZEBwBEEwIBhZFAwMMAFMEAwkDUwYRHAAQALDMVRwWBgFFGg4NFh0MB0waFlMIEB8KEhQAW0w3HAYWVRoWBgBFBwkaHB0RFA8NFgEKGx9ZFxILBkwVFgBFBQAMAFMHBwkfAFMBtsUVEhoWVQ0PFhBFAAIcUwMXGhwWABoRHAMXUxcAVR4cHRcAD0EPHAYWWw=='
 hexipher_text = '370317191c10074c1c075307070d0f1c53151a190b531000014c1c0b161716051a165344552917051c1c101659051c1107095930254506190b531d0a011e1c53120107090a001645180d101f530110411a1b12170c0e1d165e001b410a100a09190d39100a07101e0e1207061d421f015f45140f1a1c1e15140b17b0da45111959101c01104c0806164503030c0053040309035306111c001000b0cc551c160601451a0e0d161d0c074c1a165308101f0a1214005b4c371c0616551a1606004507091a1c1d11140f0d16010a1b1f5917120b064c1516004505000c00530707091f005301b6c515121a16550d0f16104500021c5303171a1c16001a111c0317531700551e1c1d17000f410f1c06165b'
-# print(cipher_text)
+# print(len(cipher_text))
 list_size_key = battery_hamming(cipher_text)
 list_of_ranked_size = sorted(list_size_key.items(), key = lambda kv:(kv[1], kv[0]))
-print(list_of_ranked_size)
-for i in range(0, 5):
-	list_block = get_list_of_key_block(list_of_ranked_size[i][0], cipher_text)
-# print(cipher_text)
-	print("\n")
-	brutalize_all_lists(list_block)
-	print("\n")
+one_by_one(hexipher_text)
+# print(list_of_ranked_size)
+# for i in range(0, 1):
+# 	list_block = get_list_of_key_block(list_of_ranked_size[i][0], cipher_text)
+# # print(cipher_text)
+# 	print("\n")
+# 	brutalize_all_lists(list_block)
 # print(list_block)
+
+
+
+# lili = {}
+# for i in range(0,256):
+# 	lili[i] = 0
+# toto = base64.b64decode(cipher_text)
+# for i in toto:
+# 	lili[i] += 1
+# lili2 = sorted(lili.items(), key = lambda kv:(kv[1], kv[0]))
+# # print(lili2)
+# lili[28] = 'e'
+# lili[22] = 't'
+# lili[0] = 'a'
+# lili[83] = 'o'
+# lili[16] = 'i'
+# lili[7] = 'n'
+# lili[26] = ' '
+# lili[23] = 's'
+# lili[69] = 'h'
+# lili[6] = 'r'
+# lili[1] = 'd'
+# lili[10] = 'l'
+# lili[3] = 'u'
+
+# lili = list(toto)
+
+# i = -1
+# for char in lili:
+# 	i +=1
+# 	if char == '\x28':
+# 		lili[i] = '\x45'
+# 	elif char == '\x22':
+# 		lili[i] = '\x54'
+# 	elif char == '\x00':
+# 		lili[i] = '\x41'
+# 	elif char == '\x83':
+# 		lili[i] = '\x4f'	
+# 	elif char == '\x16':
+# 		lili[i] = '\x49'
+# 	elif char == '\x07':
+# 		lili[i] = '\x4e'
+# 	elif char == '\x26':
+# 		lili[i] = '\x20'
+# 	elif char == '\x23':
+# 		lili[i] = '\x53'
+# 	elif char == '\x69':
+# 		lili[i] = '\x48'
+# 	elif char == '\x06':
+# 		lili[i] = '\x52'
+# 	elif char == '\x01':
+# 		lili[i] = '\x44'
+# 	elif char == '\x10':
+# 		lili[i] = '\x4c'
+# 	else:
+# 		lili[i] = lili[i]
+
+# print(str(bytes(lili)))
